@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Luong Chuoc Minh — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #7a5f2a;
+    --ink: #0d0b07;
+    --parchment: #f5f0e6;
+    --parchment-dark: #e8dfc8;
+    --smoke: #2a2418;
+    --text-body: #2e2a20;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    background: var(--ink);
+    color: var(--parchment);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    width: 30px; height: 30px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.15s ease, width 0.3s, height 0.3s, border-color 0.3s;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.35;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    background: linear-gradient(to bottom, rgba(13,11,7,0.95) 0%, transparent 100%);
+  }
+  .nav-logo {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 6rem 2rem 4rem;
+    overflow: hidden;
+  }
+
+  /* Decorative lines */
+  #hero::before, #hero::after {
+    content: '';
+    position: absolute;
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 50%;
+    animation: rotate 30s linear infinite;
+  }
+  #hero::before {
+    width: 700px; height: 700px;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+  }
+  #hero::after {
+    width: 500px; height: 500px;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    animation-direction: reverse;
+    animation-duration: 20s;
+  }
+  @keyframes rotate { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+  .hero-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  .hero-name {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 1.1;
+    color: var(--parchment);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  /* Typewriter per-letter */
+  .hero-name .letter {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: letterIn 0.6s ease forwards;
+  }
+  .hero-name .space { display: inline-block; width: 0.3em; }
+
+  .hero-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: rgba(245,240,230,0.6);
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 2.2s forwards;
+  }
+
+  .hero-contacts {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 1s ease 2.5s forwards;
+  }
+  .hero-contacts a {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+    text-transform: uppercase;
+  }
+  .hero-contacts a:hover { color: var(--gold-light); }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeIn 1s ease 3s forwards;
+  }
+  .scroll-hint span {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  @keyframes letterIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* ─── DIVIDER ─── */
+  .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 3rem auto;
+    max-width: 400px;
+  }
+  .ornament::before, .ornament::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-dim));
+  }
+  .ornament::after {
+    background: linear-gradient(to left, transparent, var(--gold-dim));
+  }
+  .ornament-symbol {
+    color: var(--gold);
+    font-size: 1.2rem;
+    font-style: italic;
+    font-family: 'IM Fell English', serif;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    font-weight: 300;
+  }
+
+  .section-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--parchment);
+    line-height: 1.1;
+    margin-bottom: 3rem;
+  }
+
+  /* ─── EDUCATION ─── */
+  .edu-card {
+    border-left: 1px solid var(--gold-dim);
+    padding-left: 2rem;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .edu-card.visible { opacity: 1; transform: translateX(0); }
+  .edu-card::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: absolute;
+    left: -4.5px; top: 6px;
+  }
+  .edu-school {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: var(--gold-light);
+    margin-bottom: 0.3rem;
+  }
+  .edu-degree {
+    font-size: 1rem;
+    color: var(--parchment);
+    font-weight: 300;
+    margin-bottom: 0.3rem;
+  }
+  .edu-meta {
+    font-size: 0.85rem;
+    color: rgba(245,240,230,0.5);
+    letter-spacing: 0.1em;
+  }
+  .edu-gpa {
+    display: inline-block;
+    margin-top: 0.8rem;
+    padding: 0.3rem 1rem;
+    border: 1px solid var(--gold-dim);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  /* ─── SKILLS ─── */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2rem;
+  }
+  .skill-group {
+    padding: 1.8rem;
+    border: 1px solid rgba(201,168,76,0.15);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.4s;
+  }
+  .skill-group.visible { opacity: 1; transform: translateY(0); }
+  .skill-group::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.04) 0%, transparent 60%);
+  }
+  .skill-group:hover { border-color: rgba(201,168,76,0.4); }
+  .skill-group-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tag {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid rgba(201,168,76,0.2);
+    color: rgba(245,240,230,0.75);
+    letter-spacing: 0.05em;
+    transition: border-color 0.3s, color 0.3s, background 0.3s;
+    cursor: default;
+  }
+  .tag:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+
+  /* ─── PROJECTS ─── */
+  .projects-list { display: flex; flex-direction: column; gap: 2.5rem; }
+
+  .project-card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    padding: 2rem;
+    border: 1px solid rgba(201,168,76,0.12);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.4s;
+  }
+  .project-card.visible { opacity: 1; transform: translateY(0); }
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s ease;
+  }
+  .project-card:hover::before { transform: scaleX(1); }
+  .project-card:hover { border-color: rgba(201,168,76,0.3); }
+
+  .project-meta { padding-top: 0.3rem; }
+  .project-number {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 3rem;
+    color: rgba(201,168,76,0.15);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .project-date {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+  .project-stack {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .stack-tag {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold-dim);
+    letter-spacing: 0.08em;
+  }
+
+  .project-content {}
+  .project-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--parchment);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .project-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .project-bullets li {
+    font-size: 0.92rem;
+    font-weight: 300;
+    color: rgba(245,240,230,0.7);
+    line-height: 1.6;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .project-bullets li::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    font-size: 0.4rem;
+    top: 0.45rem;
+    color: var(--gold);
+  }
+
+  /* ─── EXPERIENCE ─── */
+  .exp-card {
+    padding: 2.5rem;
+    border: 1px solid rgba(201,168,76,0.12);
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .exp-card.visible { opacity: 1; transform: translateY(0); }
+  .exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .exp-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--gold-light);
+  }
+  .exp-company { font-size: 0.9rem; color: rgba(245,240,230,0.5); margin-top: 0.2rem; }
+  .exp-period {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    text-align: right;
+  }
+  .exp-body {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: rgba(245,240,230,0.7);
+    line-height: 1.8;
+  }
+
+  /* ─── HOBBIES ─── */
+  .hobbies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+  .hobby-card {
+    padding: 2rem;
+    border: 1px solid rgba(201,168,76,0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s, transform 0.6s, border-color 0.4s;
+    position: relative;
+  }
+  .hobby-card.visible { opacity: 1; transform: translateY(0); }
+  .hobby-card:hover { border-color: rgba(201,168,76,0.3); }
+  .hobby-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    filter: grayscale(0.3) sepia(0.4);
+  }
+  .hobby-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--gold-light);
+    margin-bottom: 0.8rem;
+  }
+  .hobby-desc {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: rgba(245,240,230,0.65);
+    line-height: 1.7;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+  .footer-name {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.8rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .footer-tagline {
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(245,240,230,0.3);
+  }
+
+  /* ─── FULL WIDTH DARK SECTIONS ─── */
+  .section-wrapper {
+    background: var(--smoke);
+  }
+  .section-wrapper-alt {
+    background: rgba(42,36,24,0.4);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { gap: 1.5rem; }
+    .nav-links a { font-size: 0.75rem; }
+    .project-card { grid-template-columns: 1fr; }
+    .project-meta { display: flex; gap: 1.5rem; align-items: center; }
+    .project-number { font-size: 2rem; margin-bottom: 0; }
+    section { padding: 4rem 1.5rem; }
+    #hero::before, #hero::after { display: none; }
+  }
+
+  /* ─── PARTICLE STARS ─── */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    width: 1px; height: 1px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease infinite;
+    opacity: 0;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; }
+    50% { opacity: var(--o, 0.5); }
+  }
+
+  /* Subtle gold shimmer on section titles */
+  .section-title {
+    background: linear-gradient(135deg, var(--parchment) 0%, var(--gold-light) 40%, var(--parchment) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-logo">L.C. Minh</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#hobbies">Hobbies</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <p class="hero-subtitle">Software Engineer &nbsp;·&nbsp; Full Stack Developer</p>
+  <h1 class="hero-name" id="heroName"></h1>
+  <p class="hero-tagline">Crafting elegant solutions through the art of code</p>
+  <div class="hero-contacts">
+    <a href="https://github.com/muabang123" target="_blank">⊕ github.com/muabang123</a>
+    <a href="https://linkedin.com/in/Luong-Minh" target="_blank">⊕ linkedin.com/in/Luong-Minh</a>
+    <a href="mailto:nguyenminhzz283@gmail.com">⊕ nguyenminhzz283@gmail.com</a>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<div class="section-wrapper">
+  <section id="about">
+    <p class="section-label">Formation</p>
+    <h2 class="section-title">Education</h2>
+    <div class="edu-card reveal">
+      <div class="edu-school">Sai Gon University</div>
+      <div class="edu-degree">Bachelor of Software Engineering</div>
+      <div class="edu-meta">2023 — Present</div>
+      <div class="edu-gpa">GPA 3.10 / 4.0</div>
+    </div>
+  </section>
+</div>
+
+<!-- SKILLS -->
+<div id="skills">
+  <section>
+    <p class="section-label">Expertise</p>
+    <h2 class="section-title">Skills & Technologies</h2>
+    <div class="skills-grid">
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Languages</div>
+        <div class="skill-tags">
+          <span class="tag">C/C++</span>
+          <span class="tag">Python</span>
+          <span class="tag">Java</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">HTML/CSS</span>
+          <span class="tag">C#</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">PHP</span>
+          <span class="tag">Shell Script</span>
+          <span class="tag">LaTeX</span>
+        </div>
+      </div>
+      <div class="skill-group reveal" style="--delay:0.1s">
+        <div class="skill-group-title">Frameworks</div>
+        <div class="skill-tags">
+          <span class="tag">React</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">Flask</span>
+          <span class="tag">.NET WinForms</span>
+        </div>
+      </div>
+      <div class="skill-group reveal" style="--delay:0.2s">
+        <div class="skill-group-title">Tools</div>
+        <div class="skill-tags">
+          <span class="tag">Git / GitHub</span>
+          <span class="tag">Docker</span>
+          <span class="tag">VSCode</span>
+          <span class="tag">Android Studio</span>
+          <span class="tag">MySQL</span>
+          <span class="tag">Redis</span>
+        </div>
+      </div>
+      <div class="skill-group reveal" style="--delay:0.3s">
+        <div class="skill-group-title">Libraries</div>
+        <div class="skill-tags">
+          <span class="tag">pandas</span>
+          <span class="tag">NumPy</span>
+          <span class="tag">Matplotlib</span>
+          <span class="tag">Socket.IO</span>
+          <span class="tag">iTextSharp</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- PROJECTS -->
+<div class="section-wrapper" id="projects">
+  <section>
+    <p class="section-label">Portfolio</p>
+    <h2 class="section-title">Projects</h2>
+    <div class="projects-list">
+
+      <div class="project-card reveal">
+        <div class="project-meta">
+          <div class="project-number">01</div>
+          <div class="project-date">Oct – Dec 2025</div>
+          <div class="project-stack">
+            <span class="stack-tag">React</span>
+            <span class="stack-tag">Node.js</span>
+            <span class="stack-tag">MySQL</span>
+            <span class="stack-tag">Socket.IO</span>
+            <span class="stack-tag">Redis</span>
+            <span class="stack-tag">Google Maps</span>
+          </div>
+        </div>
+        <div class="project-content">
+          <div class="project-title">Smart School Bus Tracking System</div>
+          <ul class="project-bullets">
+            <li>Developed a comprehensive real-time tracking application for school buses to ensure student safety and efficient fleet management.</li>
+            <li>Implemented live GPS location monitoring using Socket.IO for real-time data transmission and integrated Google Maps API for visualization.</li>
+            <li>Managed high-performance backend services and data caching utilizing Node.js and Redis.</li>
+            <li>Collaborated with a development team to design the system architecture and real-time dashboard.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-meta">
+          <div class="project-number">02</div>
+          <div class="project-date">Nov – Dec 2025</div>
+          <div class="project-stack">
+            <span class="stack-tag">C#</span>
+            <span class="stack-tag">.NET WinForms</span>
+            <span class="stack-tag">MySQL</span>
+            <span class="stack-tag">iTextSharp</span>
+          </div>
+        </div>
+        <div class="project-content">
+          <div class="project-title">Airline Ticket Management System</div>
+          <ul class="project-bullets">
+            <li>Engineered a desktop-based management software for airline agencies to streamline ticket sales and passenger data handling.</li>
+            <li>Implemented features for multiple flight classes including Economy, Premium, and Business class ticket management.</li>
+            <li>Integrated iTextSharp library to automate the generation of professional PDF receipts and e-tickets for customers.</li>
+            <li>Developed advanced filtering and search algorithms for DataGridView to enhance user experience in flight searching.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-meta">
+          <div class="project-number">03</div>
+          <div class="project-date">Jan 2026 – Present</div>
+          <div class="project-stack">
+            <span class="stack-tag">Python</span>
+            <span class="stack-tag">Flask</span>
+            <span class="stack-tag">MySQL</span>
+            <span class="stack-tag">HTML/CSS</span>
+          </div>
+        </div>
+        <div class="project-content">
+          <div class="project-title">YouTube Lite Web App</div>
+          <ul class="project-bullets">
+            <li>Developed a lightweight video streaming platform allowing users to upload, store, and stream video content efficiently.</li>
+            <li>Architected a dual-storage system using MySQL for metadata management and local server storage for video file assets.</li>
+            <li>Built a responsive web interface using the Flask framework to ensure a seamless and intuitive user experience.</li>
+            <li>Optimized database queries to handle video metadata and user information with low latency.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- EXPERIENCE -->
+<div id="experience">
+  <section>
+    <p class="section-label">Career</p>
+    <h2 class="section-title">Experience</h2>
+    <div class="exp-card reveal">
+      <div class="exp-header">
+        <div>
+          <div class="exp-title">AI Prompt Engineer</div>
+          <div class="exp-company">Freelance — Noi That Cam Tu</div>
+        </div>
+        <div class="exp-period">July 2023 – Sept. 2023</div>
+      </div>
+      <p class="exp-body">
+        Leveraged Large Language Models (LLMs) — specifically ChatGPT — to engineer high-precision prompts for automated product marketing and brand positioning. Developed and optimized structured prompt frameworks to generate SEO-friendly content, ensuring technical accuracy for furniture specifications and enhancing digital engagement through AI-driven content workflows.
+      </p>
+    </div>
+  </section>
+</div>
+
+<!-- HOBBIES -->
+<div class="section-wrapper" id="hobbies">
+  <section>
+    <p class="section-label">Pursuits</p>
+    <h2 class="section-title">Hobbies</h2>
+    <div class="hobbies-grid">
+      <div class="hobby-card reveal">
+        <div class="hobby-icon">⚔️</div>
+        <div class="hobby-title">Algorithmic Problem Solving</div>
+        <p class="hobby-desc">Solved 10+ challenges on LeetCode across difficulty levels — Easy to Hard — with a focus on Data Structures, Algorithms, and optimizing time/space complexity. Daily practice to sharpen logical thinking and efficiency.</p>
+      </div>
+      <div class="hobby-card reveal" style="--delay:0.15s">
+        <div class="hobby-icon">🏗️</div>
+        <div class="hobby-title">Software Development</div>
+        <p class="hobby-desc">Building full-stack personal projects to explore new technologies, experiment with architectures, and bring creative ideas to life through code.</p>
+      </div>
+      <div class="hobby-card reveal" style="--delay:0.3s">
+        <div class="hobby-icon">♟️</div>
+        <div class="hobby-title">Strategic Gaming</div>
+        <p class="hobby-desc">Engaging in strategic gaming environments to enhance teamwork, tactical analysis, and rapid decision-making under high-pressure scenarios.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Luong Chuoc Minh</div>
+  <p class="footer-tagline">Software Engineer &nbsp;·&nbsp; Sai Gon University &nbsp;·&nbsp; 2023 – Present</p>
+  <div class="ornament" style="margin-top:2rem">
+    <span class="ornament-symbol">✦</span>
+  </div>
+</footer>
+
+<script>
+// ─── CURSOR ───
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animateCursor() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  cursor.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+  ring.style.transform = `translate(${rx - 15}px, ${ry - 15}px)`;
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+document.querySelectorAll('a, button, .tag, .skill-group, .project-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ring.style.width = '50px'; ring.style.height = '50px';
+    ring.style.borderColor = 'rgba(201,168,76,0.6)';
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.style.width = '30px'; ring.style.height = '30px';
+    ring.style.borderColor = 'var(--gold)';
+  });
+});
+
+// ─── STARS ───
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.cssText = `
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    --d:${2 + Math.random()*5}s;
+    --o:${0.2 + Math.random()*0.5};
+    animation-delay:${Math.random()*6}s;
+  `;
+  starsEl.appendChild(s);
+}
+
+// ─── HERO NAME TYPEWRITER ───
+const name = 'Luong Chuoc Minh';
+const nameEl = document.getElementById('heroName');
+[...name].forEach((ch, i) => {
+  const span = document.createElement('span');
+  if (ch === ' ') {
+    span.className = 'space';
+    span.style.animationDelay = `${0.9 + i * 0.07}s`;
+  } else {
+    span.className = 'letter';
+    span.textContent = ch;
+    span.style.animationDelay = `${0.9 + i * 0.07}s`;
+  }
+  nameEl.appendChild(span);
+});
+
+// ─── SCROLL REVEAL ───
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const delay = el.style.getPropertyValue('--delay') || '0s';
+      setTimeout(() => el.classList.add('visible'), parseFloat(delay) * 1000);
+      observer.unobserve(el);
+    }
+  });
+}, { threshold: 0.15 });
+reveals.forEach(el => observer.observe(el));
+
+// ─── NAV ACTIVE ───
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.background = window.scrollY > 80
+    ? 'rgba(13,11,7,0.97)'
+    : 'linear-gradient(to bottom, rgba(13,11,7,0.95) 0%, transparent 100%)';
+});
+</script>
+</body>
+</html>
